@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { games } from '@/registry'
+import GameCard from '@/components/ui/GameCard.vue'
 </script>
 
 <template>
@@ -12,7 +13,11 @@ import { games } from '@/registry'
     </section>
 
     <section class="game-grid" v-if="games.length > 0" aria-label="Game list">
-      <!-- GameCards will be rendered here in Milestone 3 -->
+      <GameCard
+        v-for="game in games"
+        :key="game.id"
+        :game="game"
+      />
     </section>
   </main>
 </template>
