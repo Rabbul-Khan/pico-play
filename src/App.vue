@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import NavBar from '@/components/layout/NavBar.vue'
 </script>
 
 <template>
-  <div>
-    <h1>PicoPlay</h1>
-    <p>Project scaffolded.</p>
-  </div>
+  <NavBar />
+  <router-view />
 </template>
