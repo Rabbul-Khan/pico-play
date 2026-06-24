@@ -1,10 +1,8 @@
 import type { GameModule } from '@/types/game'
-
-// TODO: Replace mock with real games starting at Milestone 4
-import mockGame from '@/games/_mock'
+import ticTacToe from '@/games/tic-tac-toe'
 
 export const games: GameModule[] = [
-  mockGame,
+  ticTacToe,
 ]
 
 export const gameById = new Map<string, GameModule>(

@@ -13,6 +13,7 @@ defineProps<{
   player2Score?: number
   currentRound?: number
   totalRounds?: number
+  isPlayer2Thinking?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -67,6 +68,7 @@ const emit = defineEmits<{
       :player2-score="player2Score || 0"
       :current-round="currentRound || 1"
       :total-rounds="totalRounds || 1"
+      :is-player2-thinking="isPlayer2Thinking"
     />
   </header>
 </template>

@@ -52,7 +52,8 @@ export function useGameSession(format: MatchFormat = 'single') {
     // Check if session is complete
     if (
       session.value.player1Score >= requiredWins.value ||
-      session.value.player2Score >= requiredWins.value
+      session.value.player2Score >= requiredWins.value ||
+      session.value.currentRound >= totalRounds.value
     ) {
       session.value.isSessionComplete = true
     } else {
@@ -72,8 +73,9 @@ export function useGameSession(format: MatchFormat = 'single') {
 
   const sessionWinner = computed(() => {
     if (!session.value.isSessionComplete) return null
-    if (session.value.player1Score >= requiredWins.value) return 'player1'
-    return 'player2'
+    if (session.value.player1Score > session.value.player2Score) return 'player1'
+    if (session.value.player2Score > session.value.player1Score) return 'player2'
+    return 'draw'
   })
 
   return {

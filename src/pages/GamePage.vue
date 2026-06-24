@@ -30,7 +30,27 @@ const currentSettings = ref<ResolvedSettings | null>(null)
 provide('gameSettings', computed(() => currentSettings.value || {}))
 
 // Session management
-const { session, totalRounds, reset: resetSession } = useGameSession()
+const { session, totalRounds, recordResult, reset: resetSession } = useGameSession()
+
+// Provide session functions so game boards can report results
+provide('recordResult', (result: import('@/types/game').GameResult) => {
+  recordResult(result)
+})
+provide('gameSession', computed(() => session.value))
+provide('resetSession', () => {
+  currentSettings.value = null
+  showSettings.value = true
+  resetSession('single')
+})
+provide('startRematch', () => {
+  const format = (currentSettings.value?.matchFormat as MatchFormat) || 'single'
+  resetSession(format)
+})
+
+const isPlayer2Thinking = ref(false)
+provide('setPlayer2Thinking', (isThinking: boolean) => {
+  isPlayer2Thinking.value = isThinking
+})
 
 // Computed labels for score bar
 const isVsCpu = computed(() => currentSettings.value?.mode === 'vsComputer')
@@ -78,13 +98,14 @@ watch(gameId, () => {
       :player2-score="session.player2Score"
       :current-round="session.currentRound"
       :total-rounds="totalRounds"
+      :is-player2-thinking="isPlayer2Thinking"
       @open-settings="showSettings = true"
       @open-instructions="showInstructions = true"
     />
 
     <!-- Game Board -->
     <div class="game-board" v-if="currentSettings">
-      <component :is="game.component" :key="session.currentRound" />
+      <component :is="game.component" />
     </div>
 
     <!-- Prompt to configure if no settings yet -->

@@ -68,51 +68,54 @@ function handleStart() {
 
       <form class="settings-form" @submit.prevent="handleStart">
         <!-- Mode selector (auto-injected) -->
-        <div v-if="showModeSelector" class="settings-field">
-          <label class="settings-label" for="setting-mode">Mode</label>
-          <select
-            id="setting-mode"
-            v-model="settings.mode"
-            class="settings-select"
-          >
-            <option
-              v-for="mode in game.supportedModes"
-              :key="mode"
-              :value="mode"
-            >
-              {{ modeLabels[mode] }}
-            </option>
-          </select>
+        <div v-if="showModeSelector" class="settings-mode-container">
+          <div class="settings-field">
+            <label class="settings-label" id="mode-label">Mode</label>
+            <div class="segmented-control" role="group" aria-labelledby="mode-label">
+              <button
+                v-for="mode in game.supportedModes"
+                :key="mode"
+                type="button"
+                class="segmented-btn"
+                :class="{ 'segmented-btn--active': settings.mode === mode }"
+                @click="settings.mode = mode"
+              >
+                {{ modeLabels[mode] }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Schema-driven fields -->
         <template v-for="field in game.settingsSchema" :key="field.key">
-          <div
-            v-if="isFieldVisible(field)"
-            class="settings-field"
-          >
-            <label
-              class="settings-label"
-              :for="`setting-${field.key}`"
-            >
-              {{ field.label }}
-            </label>
+          <transition name="slide-field">
+            <div v-show="isFieldVisible(field)" class="settings-field-container">
+              <div class="settings-field">
+                <label
+                  class="settings-label"
+                  :id="`label-${field.key}`"
+                >
+                  {{ field.label }}
+                </label>
 
-            <!-- Select -->
-            <select
-              v-if="field.type === 'select'"
-              :id="`setting-${field.key}`"
-              v-model="settings[field.key]"
-              class="settings-select"
-            >
-              <option
-                v-for="opt in field.options"
-                :key="String(opt.value)"
-                :value="opt.value"
-              >
-                {{ opt.label }}
-              </option>
-            </select>
+                <!-- Segmented Control for 'select' -->
+                <div 
+                  v-if="field.type === 'select'" 
+                  class="segmented-control" 
+                  role="group" 
+                  :aria-labelledby="`label-${field.key}`"
+                >
+                  <button
+                    v-for="opt in field.options"
+                    :key="String(opt.value)"
+                    type="button"
+                    class="segmented-btn"
+                    :class="{ 'segmented-btn--active': settings[field.key] === opt.value }"
+                    @click="settings[field.key] = opt.value"
+                  >
+                    {{ opt.label }}
+                  </button>
+                </div>
 
             <!-- Toggle -->
             <button
@@ -141,6 +144,8 @@ function handleStart() {
               <span class="settings-range-value">{{ settings[field.key] }}</span>
             </div>
           </div>
+        </div>
+      </transition>
         </template>
 
         <button type="submit" class="settings-start">
@@ -167,7 +172,36 @@ function handleStart() {
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-4);
+}
+
+.settings-mode-container {
+  margin-bottom: var(--spacing-4);
+}
+
+.settings-field-container {
+  margin-bottom: var(--spacing-4);
+  overflow: hidden;
+}
+
+.slide-field-enter-active,
+.slide-field-leave-active {
+  transition: all 250ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.slide-field-enter-from,
+.slide-field-leave-to {
+  opacity: 0;
+  max-height: 0;
+  margin-bottom: 0;
+  transform: translateY(-8px);
+}
+
+.slide-field-enter-to,
+.slide-field-leave-from {
+  opacity: 1;
+  max-height: 100px;
+  margin-bottom: var(--spacing-4);
+  transform: translateY(0);
 }
 
 .settings-field {
@@ -182,38 +216,38 @@ function handleStart() {
   color: var(--color-text-secondary);
 }
 
-.settings-select {
-  appearance: none;
-  width: 100%;
-  padding: var(--spacing-2) var(--spacing-3);
-  font-family: var(--font-ui);
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
+/* Segmented Control */
+.segmented-control {
+  display: flex;
   background-color: var(--color-bg-primary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.segmented-btn {
+  flex: 1;
+  padding: var(--spacing-2) var(--spacing-2);
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
   cursor: pointer;
-  transition: border-color 150ms ease;
-
-  /* Custom dropdown arrow */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  padding-right: 32px;
+  transition: all 150ms ease;
+  text-align: center;
 }
 
-.settings-select:hover {
-  border-color: var(--color-text-secondary);
+.segmented-btn:hover {
+  color: var(--color-text-primary);
 }
 
-.settings-select:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-}
-
-.settings-select option {
+.segmented-btn--active {
   background-color: var(--color-bg-elevated);
   color: var(--color-text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Toggle */

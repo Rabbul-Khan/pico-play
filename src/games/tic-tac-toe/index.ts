@@ -1,14 +1,14 @@
 import type { GameModule } from '@/types/game'
-import MockIcon from './MockIcon.vue'
-import MockBoard from './MockBoard.vue'
-import MockInstructions from './MockInstructions.vue'
+import TicTacToeIcon from './TicTacToeIcon.vue'
+import TicTacToeBoard from './TicTacToeBoard.vue'
+import TicTacToeInstructions from './TicTacToeInstructions.vue'
 
-const mockGame: GameModule = {
-  id: 'mock',
-  name: 'Mock Game',
-  description: 'A test game to verify platform flow',
+const ticTacToe: GameModule = {
+  id: 'tic-tac-toe',
+  name: 'Tic Tac Toe',
+  description: 'Classic 3×3 strategy game',
   complexity: 'easy',
-  icon: MockIcon,
+  icon: TicTacToeIcon,
   supportedModes: ['vsComputer', 'localMultiplayer'],
   settingsSchema: [
     {
@@ -24,15 +24,16 @@ const mockGame: GameModule = {
       showWhen: { key: 'mode', value: 'vsComputer' },
     },
     {
-      key: 'size',
-      label: 'Grid Size',
+      key: 'firstMove',
+      label: 'First Move',
       type: 'select',
       options: [
-        { label: 'Small (2×2)', value: 'small' },
-        { label: 'Medium (3×3)', value: 'medium' },
-        { label: 'Large (5×5)', value: 'large' },
+        { label: 'Player', value: 'player' },
+        { label: 'CPU', value: 'cpu' },
+        { label: 'Random', value: 'random' },
       ],
-      default: 'medium',
+      default: 'player',
+      showWhen: { key: 'mode', value: 'vsComputer' },
     },
     {
       key: 'matchFormat',
@@ -41,12 +42,13 @@ const mockGame: GameModule = {
       options: [
         { label: 'Single Match', value: 'single' },
         { label: 'Best of 3', value: 'bo3' },
+        { label: 'Best of 5', value: 'bo5' },
       ],
       default: 'single',
     },
   ],
-  instructions: MockInstructions,
-  component: MockBoard,
+  instructions: TicTacToeInstructions,
+  component: TicTacToeBoard,
 }
 
-export default mockGame
+export default ticTacToe
